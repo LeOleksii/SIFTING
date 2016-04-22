@@ -1,0 +1,11 @@
+function I = ScaleCrop( image, scale )
+    B = imresize(image,scale);
+    Center = 0.5*size(B);
+    xmin = round(Center(1) - size(image,1)/2);
+    ymin = round(Center(2) - size(image,2)/2);
+    xmax = 
+    
+    rect =  [xmin ymin  (size(image,2)-1) (size(image,1)-1)];
+    I = imcrop(B,rect);
+end
+

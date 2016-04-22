@@ -9,7 +9,7 @@ middleP_X = 2200+(500/2);
 Image4rotation = Image_00a(middleP_X-1500:middleP_X+1500,middleP_Y-1500:middleP_Y+1500,1:3);
 %create cell array to store rotated planes
 rotatedIM = cell(1,18);
-field = 'H';
+field = 'Rotation';
 value = {};
 for i = -45:5:45 
     ind = (i/5)+10;
@@ -29,8 +29,33 @@ for i = -45:5:45
         imwrite(NoisyIm,name);
     end
     %now we can compute homography matrix
-    value = [value; computeHomo(i)];
+    value = [value; computeHomoRotation(i)];
 end
 %creating&saving struct with homographies
 Sequence3Homographies = struct(field,value);
 save SEQUENCE3\Sequence3Homographies.mat Sequence3Homographies
+
+% SEQUENCE 2 - zoom in
+field = 'Scale';
+value = {};
+ind = 1;
+for scale = 1.1:0.05:1.5
+    I = ScaleCrop( IM, scale );
+    name = strcat('SEQUENCE2\','Image_zoom_',num2str(100*(scale-1)),'%','.png');
+    imwrite(I,name);
+    H = computeHomoScale(scale);
+    value = [value; computeHomoScale(ind)];
+    ind = ind +1;
+end
+Sequence2Homographies = struct(field,value);
+save SEQUENCE2\Sequence2Homographies.mat Sequence2Homographies
+
+
+
+
+
+
+
+
+
+
