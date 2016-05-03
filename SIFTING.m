@@ -52,34 +52,23 @@ Sequence2Homographies = struct(field,value);
 
 %% Projective
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
-d = 150;
+d = 250;
 tmp = Image_00a(2200:(2200+500-1),1800-d:(1800+750-1)+d,1:3);
-pprime = [0 0; size(tmp, 2), 0; size(tmp, 2), size(tmp, 1); 0, size(tmp, 1)];
-p = [0 0; size(tmp, 2), 0; size(tmp, 2)-d, size(tmp, 1); d, size(tmp, 1)];
 
-% pprime = [-d 0; size(IM, 2)+d, 0; size(IM, 2)+d, size(IM, 1); -d, size(IM, 1)];
-% p = [-d 0; size(IM, 2)+d, 0; size(IM, 2), size(IM, 1); 0, size(IM, 1)];
+p =      [0 0;  size(IM, 2),   0; size(IM, 2), size(IM, 1);  0, size(IM, 1)];
+pprime = [-d 0; size(IM, 2)+d, 0; size(IM, 2), size(IM, 1);  0, size(IM, 1)];
 
-A = []; b=[];
-for i = 1:4
-    A = [A; pprime(i, 1), pprime(i,2), 1, 0, 0, 0, -p(i,1)*pprime(i,1), -p(i,1)*pprime(i, 2)];
-    A = [A; 0, 0, 0, pprime(i, 1), pprime(i, 2), 1, -p(i,2)*pprime(i,1), -p(i,2)*pprime(i,2)];
-    b = [b; p(i,1); p(i,2)];
-end;
-h = A\b;
-h(9) = 1;
-h = reshape(h, 3, 3);
-tform = maketform('projective', h);
-proj = imtransform(tmp, tform);
-% figure, imshow(proj);
-crop = proj(:, d:size(tmp,2)-d, :);
+h = fitgeotrans(p, pprime, 'projective');
+h = h.T;
+tform = projective2d(h);
 
-figure, imshow(IM), hold on;
-scatter(320, 320, 'b*');
-x = 320; y = 320;
-newP = h*[x;y;1];
+R = imref2d(size(IM));
+
+proj = imwarp(IM, tform, 'OutputView', R);
+figure, imshow(IM), hold on, title('Before');
+P = [304; 327; 1];
+scatter(P(1), P(2), 'b*');
+newP = h'*P;
 newP(:) = newP(:)/newP(3);
-figure, imshow(proj), hold on;
-scatter(newP(2), newP(1), 'b*');
-scatter(newP(1), newP(2), 'bo');
-
+figure, imshow(proj), hold on, title('After');
+scatter(newP(1), newP(2), 'b*');
