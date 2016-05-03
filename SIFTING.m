@@ -51,24 +51,44 @@ Sequence2Homographies = struct(field,value);
 % save SEQUENCE2/Sequence2Homographies.mat Sequence2Homographies
 
 %% Projective
+
+dx = [100, 150, 350,   0,   0,   0];
+dy = [  0,   0,   0, 100, 150, 350];
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
-d = 250;
-tmp = Image_00a(2200:(2200+500-1),1800-d:(1800+750-1)+d,1:3);
+for k = 1:size(dx,2)
+    p1 =      [     0, 0;       size(IM, 2),      0; size(IM, 2),       size(IM, 1);  0, size(IM, 1)];
+    pprime1 = [-dx(k), 0; size(IM, 2)+dx(k), -dy(k); size(IM, 2), size(IM, 1)+dy(k);  0, size(IM, 1)];
+    
+    p2 =      [0,      0;  size(IM, 2), 0;       size(IM, 2), size(IM, 1);      0,       size(IM, 1)];
+    pprime2 = [0, -dy(k);  size(IM, 2), 0; size(IM, 2)+dx(k), size(IM, 1); -dx(k), size(IM, 1)+dy(k)];
 
-p =      [0 0;  size(IM, 2),   0; size(IM, 2), size(IM, 1);  0, size(IM, 1)];
-pprime = [-d 0; size(IM, 2)+d, 0; size(IM, 2), size(IM, 1);  0, size(IM, 1)];
+    h1 = fitgeotrans(p1, pprime1, 'projective');
+    h1 = h1.T;
+    tform1 = projective2d(h1);
+    
+    h2 = fitgeotrans(p2, pprime2, 'projective');
+    h2 = h2.T;
+    tform2 = projective2d(h2);
 
-h = fitgeotrans(p, pprime, 'projective');
-h = h.T;
-tform = projective2d(h);
-
-R = imref2d(size(IM));
-
-proj = imwarp(IM, tform, 'OutputView', R);
-figure, imshow(IM), hold on, title('Before');
-P = [304; 327; 1];
-scatter(P(1), P(2), 'b*');
-newP = h'*P;
-newP(:) = newP(:)/newP(3);
-figure, imshow(proj), hold on, title('After');
-scatter(newP(1), newP(2), 'b*');
+    R = imref2d(size(IM));
+    
+    % stretch top, stretch right
+    proj = imwarp(IM, tform1, 'OutputView', R);
+    figure, imshow(IM), hold on, title('Before 1');
+    P = [304; 327; 1];
+    scatter(P(1), P(2), 'b*');
+    newP = h1'*P;
+    newP(:) = newP(:)/newP(3);
+    figure, imshow(proj), hold on, title('After 1');
+    scatter(newP(1), newP(2), 'b*');
+    
+    % stretch bottom, stretch left
+    proj = imwarp(IM, tform2, 'OutputView', R);
+    figure, imshow(IM), hold on, title('Before 2');
+    P = [304; 327; 1];
+    scatter(P(1), P(2), 'b*');
+    newP = h2'*P;
+    newP(:) = newP(:)/newP(3);
+    figure, imshow(proj), hold on, title('After 2');
+    scatter(newP(1), newP(2), 'b*');
+end;
