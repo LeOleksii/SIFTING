@@ -51,9 +51,8 @@ Sequence2Homographies = struct(field,value);
 % save SEQUENCE2/Sequence2Homographies.mat Sequence2Homographies
 
 %% Projective
-
-dx = [100, 150, 350,   0,   0,   0];
-dy = [  0,   0,   0, 100, 150, 350];
+dx = [100, 150, 200, 300,   0,   0,   0,   0];
+dy = [  0,   0,   0    0, 100, 150, 200, 300];
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
 for k = 1:size(dx,2)
     p1 =      [     0, 0;       size(IM, 2),      0; size(IM, 2),       size(IM, 1);  0, size(IM, 1)];
@@ -74,9 +73,9 @@ for k = 1:size(dx,2)
     
     % stretch top, stretch right
     proj = imwarp(IM, tform1, 'OutputView', R);
-    figure, imshow(IM), hold on, title('Before 1');
+%     figure, imshow(IM), hold on, title('Before 1');
     P = [304; 327; 1];
-    scatter(P(1), P(2), 'b*');
+%     scatter(P(1), P(2), 'b*');
     newP = h1'*P;
     newP(:) = newP(:)/newP(3);
     figure, imshow(proj), hold on, title('After 1');
@@ -84,9 +83,9 @@ for k = 1:size(dx,2)
     
     % stretch bottom, stretch left
     proj = imwarp(IM, tform2, 'OutputView', R);
-    figure, imshow(IM), hold on, title('Before 2');
+%     figure, imshow(IM), hold on, title('Before 2');
     P = [304; 327; 1];
-    scatter(P(1), P(2), 'b*');
+%     scatter(P(1), P(2), 'b*');
     newP = h2'*P;
     newP(:) = newP(:)/newP(3);
     figure, imshow(proj), hold on, title('After 2');
