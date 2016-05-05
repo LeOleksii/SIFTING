@@ -54,23 +54,35 @@ Sequence2Homographies = struct(field,value);
 dx = [100, 150, 200, 300,   0,   0,   0,   0];
 dy = [  0,   0,   0    0, 100, 150, 200, 300];
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
+field = 'TILT_ANGLE';
+value = {};
+ind = 1;
 for k = 1:size(dx,2)
     p1 =      [     0, 0;       size(IM, 2),      0; size(IM, 2),       size(IM, 1);  0, size(IM, 1)];
     pprime1 = [-dx(k), 0; size(IM, 2)+dx(k), -dy(k); size(IM, 2), size(IM, 1)+dy(k);  0, size(IM, 1)];
     
     p2 =      [0,      0;  size(IM, 2), 0;       size(IM, 2), size(IM, 1);      0,       size(IM, 1)];
     pprime2 = [0, -dy(k);  size(IM, 2), 0; size(IM, 2)+dx(k), size(IM, 1); -dx(k), size(IM, 1)+dy(k)];
-
+    
     h1 = fitgeotrans(p1, pprime1, 'projective');
     h1 = h1.T;
+    value = [value; h1];
     tform1 = projective2d(h1);
-    
+    if k<5 
+        var = num2str(dx(k));  
+        name1 = strcat('SEQUENCE1/','Image_tilt_x',var,'.png');
+        name2 = strcat('SEQUENCE1/','Image_tilt_x-',var,'.png');
+        
+    else
+        var = num2str(dy(k));
+        name1 = strcat('SEQUENCE1/','Image_tilt_y',var,'.png');
+        name2 = strcat('SEQUENCE1/','Image_tilt_y-',var,'.png');
+    end
     h2 = fitgeotrans(p2, pprime2, 'projective');
     h2 = h2.T;
+    value = [value; h1];
     tform2 = projective2d(h2);
-
-    R = imref2d(size(IM));
-    
+    R = imref2d(size(IM));    
     % stretch top, stretch right
     proj = imwarp(IM, tform1, 'OutputView', R);
 %     figure, imshow(IM), hold on, title('Before 1');
@@ -80,7 +92,7 @@ for k = 1:size(dx,2)
     newP(:) = newP(:)/newP(3);
     figure, imshow(proj), hold on, title('After 1');
     scatter(newP(1), newP(2), 'b*');
-    
+    imwrite(proj,name1);
     % stretch bottom, stretch left
     proj = imwarp(IM, tform2, 'OutputView', R);
 %     figure, imshow(IM), hold on, title('Before 2');
@@ -90,4 +102,7 @@ for k = 1:size(dx,2)
     newP(:) = newP(:)/newP(3);
     figure, imshow(proj), hold on, title('After 2');
     scatter(newP(1), newP(2), 'b*');
+    imwrite(proj,name2);
 end;
+Sequence1Homographies = struct(field,value);
+save SEQUENCE1/Sequence1Homographies.mat Sequence2Homographies
