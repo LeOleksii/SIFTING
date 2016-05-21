@@ -1,4 +1,4 @@
-function [tformCenteredRotation, outImage, outReference] = computeHomoRotation( image, theta )
+function [tformCenteredRotation, outImage] = computeHomoRotation( image, theta )
     Rdefault = imref2d(size(image));
     tX = mean(Rdefault.XWorldLimits);
     tY = mean(Rdefault.YWorldLimits);
@@ -7,6 +7,6 @@ function [tformCenteredRotation, outImage, outReference] = computeHomoRotation( 
     tTranslationBackToOriginalCenter = [1 0 0; 0 1 0; tX tY,1];
     tformCenteredRotation = tTranslationToCenterAtOrigin*tRotation*tTranslationBackToOriginalCenter;
     tformCenteredRotation = affine2d(tformCenteredRotation);
-    [outImage,outReference] = imwarp(image, tformCenteredRotation);
+    outImage = imwarp(image, tformCenteredRotation);
 end
 

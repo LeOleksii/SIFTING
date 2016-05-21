@@ -22,7 +22,7 @@ field = 'H';
 value = {};
 for angle = -45:5:45
     ind = ind + 1;
-    [~, outBig, RoutBig] = computeHomoRotation(Image4rotation, angle);
+    [~, outBig] = computeHomoRotation(Image4rotation, angle);
     tformCenteredRotation = computeHomoRotation(IM, angle);
     value{ind} = tformCenteredRotation.T';
     Rim = imref2d(size(outBig));
@@ -51,15 +51,23 @@ for noise = 1:4
     imwrite(NoisyIm,name);
 end
 ind = 1;
+oRef = imref2d(size(IM));
 for scale = 1.1:0.05:1.5
-    I = ScaleCrop( IM, scale );
+    [height, width, ~] = size(IM);
+    
+    tx = width*scale - width;
+    ty = height*scale-height;
+    h = [scale 0 0;
+         0 scale 0;
+         -tx/2 -ty/2 1];
+    tform = affine2d(h);
+    scaled = imwarp(IM, tform, 'OutputView', oRef);
     for noise = 1:4
-        NoisyIm = AddNoise(I,noiseLevels(noise));
+        NoisyIm = AddNoise(scaled,noiseLevels(noise));
         name = strcat('SEQUENCE2/','Image_',sprintf('%02d',ind),noiseLabels(noise),'.png');
         imwrite(NoisyIm,name);
     end;
-    H = computeHomoScale(scale);
-    value = [value; computeHomoScale(ind)];
+    value{ind} = tform.T';
     ind = ind +1;
 end
 Sequence2Homographies = struct(field,value);
