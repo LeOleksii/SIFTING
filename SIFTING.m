@@ -4,34 +4,37 @@ Image_00a = imread('Image_base_050.jpg');
 %% SEQUENCE 3 - rotation
 %cropping original image
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
-imwrite(IM,'SEQUENCE3/Image_00a.png');
+
 middleP_Y = 1800+(750/2);
 middleP_X = 2200+(500/2);
-Image4rotation = Image_00a(middleP_X-1500:middleP_X+1500,middleP_Y-1500:middleP_Y+1500,1:3);
-%create cell array to store rotated planes
-rotatedIM = cell(1,18);
+Image4rotation = Image_00a(middleP_X-1500+1:middleP_X+1500,middleP_Y-1500+1:middleP_Y+1500,1:3);
+
+noiseLevels = [0 3 6 18];
+noiseLabels = ['a' ,'b', 'c', 'd'];
+
+for noise = 1:4
+    NoisyIm = AddNoise(IM, noiseLevels(noise));
+    name = strcat('SEQUENCE3/','Image_00',noiseLabels(noise),'.png');
+    imwrite(NoisyIm,name);
+end
+ind = 0;
 field = 'H';
 value = {};
-for i = -45:5:45 
-    ind = (i/5)+10;
-    rotatedIM{ind} = imrotate(Image4rotation,i);
-    middleP = 0.5*size(rotatedIM{ind});
-    rotatedIM{ind} = rotatedIM{ind}(middleP(2)-250:middleP(2)+249,middleP(1)-375:middleP(1)+374,1:3);
-    %now we have rotated image: rotatedIM{ind}. lets add noise and save 4 versions
-    noiseLevels = [0 3 6 18];
-    noiseLabels = ['a' ,'b', 'c', 'd'];
+for angle = -45:5:45
+    ind = ind + 1;
+    [~, outBig, RoutBig] = computeHomoRotation(Image4rotation, angle);
+    tformCenteredRotation = computeHomoRotation(IM, angle);
+    value{ind} = tformCenteredRotation.T';
+    Rim = imref2d(size(outBig));
+    dX = mean(Rim.XWorldLimits);
+    dY = mean(Rim.YWorldLimits);
+    rotatedIM = outBig(dX-250:dX+249,dY-375:dY+374,1:3);
     for noise = 1:4
-        NoisyIm = AddNoise(rotatedIM{ind},noiseLevels(noise));
-        if (ind-1) < 10
-            name = strcat('SEQUENCE3/','Image_','0',num2str(ind-1),noiseLabels(noise),'.png');
-        else
-            name = strcat('SEQUENCE3/','Image_',num2str(ind-1),noiseLabels(noise),'.png');
-        end
+        NoisyIm = AddNoise(rotatedIM, noiseLevels(noise));
+        name = strcat('SEQUENCE3/','Image_',sprintf('%02d',ind),noiseLabels(noise),'.png');
         imwrite(NoisyIm,name);
-    end
-    %now we can compute homography matrix
-    value = [value; computeHomoRotation(i)];
-end
+    end;
+end;
 %creating&saving struct with homographies
 Sequence3Homographies = struct(field,value);
 save SEQUENCE3/Sequence3Homographies.mat Sequence3Homographies
@@ -62,7 +65,7 @@ end
 Sequence2Homographies = struct(field,value);
 save SEQUENCE2/Sequence2Homographies.mat Sequence2Homographies
 
-%% SEQUENCE 3 - tilting (projective transformation)
+%% SEQUENCE 1 - tilting (projective transformation)
 dx = [100, 150, 200, 300,   0,   0,   0,   0];
 dy = [  0,   0,   0    0, 100, 150, 200, 300];
 IM = Image_00a(2200:(2200+500-1),1800:(1800+750-1),1:3);
