@@ -1,9 +1,9 @@
-function [ curve ] = TestPerformance( H, directoryPath )
+% function [ curve ] = TestPerformance( H, directoryPath )
+
 %this is for testing
 directoryPath = 'SEQUENCE1';
-H = load('D:\VIBOT\VISUAL_PERCEPTION\lab4_final\SIFTING\SEQUENCE1\Sequence1Homographies');
+H = load('SEQUENCE1/Sequence1Homographies');
 %testing
-
 
 str = strcat(directoryPath,'/*.png');
 imagefiles = dir(str);   
@@ -26,14 +26,17 @@ NoisyNames = reshape(NoisyNames,[length(names_cut)/4,4])';
 for n=1:4
     %Finding locations of keypoints in original image    
     Chart = zeros(1,size(NoisyNames,2));
-    [~, ~, locs] = sift(names{n});
-    OrigLocs = locs(:,1:2);   
-    OrigLocs = [OrigLocs  ones(size(OrigLocs,1),1)];
-    
+    imOrig = single(rgb2gray(imread(names{n})));
+    locs = vl_sift(imOrig);
+    OrigLocs = locs(1:2,:);
+    OrigLocs = [OrigLocs;  ones(1, size(OrigLocs,2))];
+    OrigLocs = OrigLocs';
      for images = 1:size(NoisyNames,2)
         name = char(NoisyNames(n,images));
-        [~, ~, locs] = sift(name);
-        ImageKeys = locs(:,1:2);
+        im = single(rgb2gray(imread(name)));
+        locs = vl_sift(im);
+        ImageKeys = locs(1:2,:);
+        ImageKeys = ImageKeys';
         %ImageKeys = [ImageKeys  ones(size(ImageKeys,1),1)];
         %now lets apply homography on orig keys
         ModifOrigLocs = zeros(size(OrigLocs,1),size(OrigLocs,2));
@@ -42,8 +45,15 @@ for n=1:4
             ModifOrigLocs(k,:) = ModifOrigLocs(k,:) ./ ModifOrigLocs(k,3);
         end
         ModifOrigLocs = ModifOrigLocs(:,1:2);
+        
+        figure, imshow(imOrig, []), hold on;
+        plot(OrigLocs(:,1), OrigLocs(:,2), 'b.');
+        figure, imshow(im, []), hold on;
+        plot(ModifOrigLocs(:,1), ModifOrigLocs(:,2), 'go', 'MarkerSize', 15, 'MarkerFaceColor', [0, 1, 0]);
+        plot(ImageKeys(:,1), ImageKeys(:,2), 'rd', 'MarkerSize', 10, 'MarkerFaceColor', [1, 0, 0]);
         %compare features
         Counter = 0;
+        
         for comp = 1: size(ModifOrigLocs,1)
             point = ModifOrigLocs(comp,:);
             mindist = KeyDist( point, ImageKeys );
@@ -66,5 +76,5 @@ end
  
 f = 5;
 
-end
+% end
 
