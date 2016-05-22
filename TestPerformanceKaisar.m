@@ -18,7 +18,7 @@ H = Sequence2Homographies;
 noiseLabels = ['a', 'b', 'c', 'd'];
 percentage = zeros(4, size(H,2));
 for i = 1:4
-    percentage(i,:) = computeMatches(H, 2, noiseLabels(i), 5.0);
+    percentage(i,:) = computeMatches(H, 2, noiseLabels(i), 2.0);
 end;
 toc
 %% Sequence 3
