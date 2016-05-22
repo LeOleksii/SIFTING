@@ -1,4 +1,5 @@
-%function  SIFTING
+% Run this script to generate three image sequences.
+
 % original image
 Image_00a = imread('Image_base_050.jpg');
 %% SEQUENCE 3 - rotation
@@ -13,7 +14,7 @@ noiseLevels = [0 3 6 18];
 noiseLabels = ['a' ,'b', 'c', 'd'];
 
 for noise = 1:4
-    NoisyIm = AddNoise(IM, noiseLevels(noise));
+    NoisyIm = addNoise(IM, noiseLevels(noise));
     name = strcat('SEQUENCE3/','Image_00',noiseLabels(noise),'.png');
     imwrite(NoisyIm,name);
 end
@@ -30,7 +31,7 @@ for angle = -45:5:45
     dY = mean(Rim.YWorldLimits);
     rotatedIM = outBig(dX-250:dX+249,dY-375:dY+374,1:3);
     for noise = 1:4
-        NoisyIm = AddNoise(rotatedIM, noiseLevels(noise));
+        NoisyIm = addNoise(rotatedIM, noiseLevels(noise));
         name = strcat('SEQUENCE3/','Image_',sprintf('%02d',ind),noiseLabels(noise),'.png');
         imwrite(NoisyIm,name);
     end;
@@ -46,7 +47,7 @@ value = {};
 noiseLevels = [0 3 6 18];
 noiseLabels = ['a' ,'b', 'c', 'd'];
 for noise = 1:4
-    NoisyIm = AddNoise(IM,noiseLevels(noise));
+    NoisyIm = addNoise(IM,noiseLevels(noise));
     name = strcat('SEQUENCE2/','Image_00',noiseLabels(noise),'.png');
     imwrite(NoisyIm,name);
 end
@@ -63,7 +64,7 @@ for scale = 1.1:0.05:1.5
     tform = affine2d(h);
     scaled = imwarp(IM, tform, 'OutputView', oRef);
     for noise = 1:4
-        NoisyIm = AddNoise(scaled,noiseLevels(noise));
+        NoisyIm = addNoise(scaled,noiseLevels(noise));
         name = strcat('SEQUENCE2/','Image_',sprintf('%02d',ind),noiseLabels(noise),'.png');
         imwrite(NoisyIm,name);
     end;
@@ -82,7 +83,7 @@ value = {};
 noiseLevels = [0 3 6 18];
 noiseLabels = ['a' ,'b', 'c', 'd'];
 for noise = 1:4
-    NoisyIm = AddNoise(IM,noiseLevels(noise));
+    NoisyIm = addNoise(IM,noiseLevels(noise));
     name = strcat('SEQUENCE1/','Image_00',noiseLabels(noise),'.png');
     imwrite(NoisyIm,name);
 end
@@ -107,8 +108,8 @@ for k = 1:size(dx,2)
     proj2 = imwarp(IM, tform2, 'OutputView', R);
     
     for noise = 1:4
-        NoisyIm1 = AddNoise(proj1,noiseLevels(noise));
-        NoisyIm2 = AddNoise(proj2,noiseLevels(noise));
+        NoisyIm1 = addNoise(proj1,noiseLevels(noise));
+        NoisyIm2 = addNoise(proj2,noiseLevels(noise));
         name1 = strcat('SEQUENCE1/','Image_',sprintf('%02d',k),noiseLabels(noise),'.png');
         name2 = strcat('SEQUENCE1/','Image_',sprintf('%02d',k+8),noiseLabels(noise),'.png');
         imwrite(NoisyIm1,name1);

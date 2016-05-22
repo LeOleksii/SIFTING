@@ -1,4 +1,8 @@
-function percentage = siftModificationPerformance( H, sequenceNumber, noise, threshold )
+% This function returns the percentage of correct matches given Homography
+% matrices, sequenc number, noise and threshold. This performance tester
+% does not consider rotation invariance of SIFT.
+
+function percentage = siftModification( H, sequenceNumber, noise, threshold )
 n = size(H, 2);
 percentage = zeros(1, n);
 name = sprintf('SEQUENCE%d/Image_00%s.png',sequenceNumber, noise);

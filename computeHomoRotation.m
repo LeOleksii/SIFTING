@@ -1,3 +1,5 @@
+% Computes homography matrix for rotation keeping the coordinate system in
+% the center.
 function [tformCenteredRotation, outImage] = computeHomoRotation( image, theta )
     Rdefault = imref2d(size(image));
     tX = mean(Rdefault.XWorldLimits);

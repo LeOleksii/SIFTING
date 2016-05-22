@@ -1,8 +1,7 @@
+% This function returns the percentage of correct matches given Homography
+% matrices, sequenc number, noise and threshold.
+
 function percentage = computeMatches( H, sequenceNumber, noise, threshold )
-% load 'SEQUENCE1/Sequence1Homographies.mat'
-% H = Sequence1Homographies;
-% sequenceNumber = 1;
-% noise = 'a';
     n = size(H, 2);
     percentage = zeros(1, n);
     name = sprintf('SEQUENCE%d/Image_00%s.png',sequenceNumber, noise);

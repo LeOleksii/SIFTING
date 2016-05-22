@@ -1,4 +1,6 @@
-function I = AddNoise( image,StandDeviation )
+% Return an image after adding noise with a given standard deviation on the
+% input image.
+function I = addNoise( image,StandDeviation )
 xmin = -StandDeviation;
 xmax = StandDeviation;
 %create noise for RGB channels
